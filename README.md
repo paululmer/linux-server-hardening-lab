@@ -1,87 +1,118 @@
 # linux-server-hardening-lab
 A hands-on cybersecurity home lab focused on Linux server hardening, system security, monitoring, and vulnerability assessment.
 
-## Security Evidence
+# Linux Server Hardening Lab
+
+A hands-on Ubuntu Server security project focused on system hardening, secure remote administration, firewall configuration, intrusion protection, logging, auditing, and vulnerability assessment.
+
+## Project Overview
+
+This lab began with a baseline Ubuntu Server installation running in Oracle VirtualBox and progressed through a series of security improvements.
+
+Key areas included:
+
+- Linux patch management
+- User and privilege hardening
+- SSH key-based authentication
+- SSH configuration hardening
+- UFW firewall deployment
+- Fail2Ban intrusion protection
+- System logging and auditing
+- Lynis vulnerability assessment
+- Post-remediation validation
+
+## Environment
+
+| Component | Configuration |
+|---|---|
+| Host | Windows |
+| Hypervisor | Oracle VirtualBox |
+| Guest OS | Ubuntu Server 26.04.1 LTS |
+| Hostname | linuxhardening |
+| RAM | 4 GB |
+| CPUs | 2 |
+| Disk | 25 GB |
+| Network | VirtualBox NAT |
+| SSH | Host port 2222 → Guest port 22 |
+
+## Security Improvements
+
+The server was hardened through a defense-in-depth approach.
+
+```text
+UFW Firewall
+     ↓
+Hardened SSH
+     ↓
+Key Authentication
+     ↓
+Fail2Ban
+     ↓
+Least Privilege
+     ↓
+Logging / Auditing
+     ↓
+Lynis Security Assessment
+```
+
+## Key Results
+
+| Control | Before | After |
+|---|---|---|
+| UFW | Inactive | Active |
+| Incoming policy | No UFW default deny | Default deny |
+| SSH passwords | Enabled | Disabled |
+| SSH keys | Not configured | Ed25519 authentication |
+| Root SSH login | Restricted default | Explicitly disabled |
+| Max SSH auth attempts | 6 | 3 |
+| LXD membership | User was a member | Removed |
+| Fail2Ban | Not installed | Active |
+| Lynis hardening index | 65 | 69 |
+
+## Evidence
 
 ### SSH Hardening
 
-The final OpenSSH configuration was reviewed to verify that the intended controls were actually active.
+![SSH Hardening](screenshots/02-ssh-hardening.png)
 
-![SSH Hardening](<img width="1055" height="210" alt="02-ssh-hardening" src="https://github.com/user-attachments/assets/74e56101-1d57-4b0c-ae55-3dae713c3816" />
-)
+The final SSH configuration disables password authentication and root login while requiring public-key authentication and restricting unnecessary forwarding features.
 
-Key controls include:
+### Firewall
 
-- Public-key authentication enabled
-- Password authentication disabled
-- Direct root SSH login disabled
-- Maximum authentication attempts reduced to 3
-- X11 forwarding disabled
-- TCP forwarding disabled
-- SSH agent forwarding disabled
-- Verbose SSH logging enabled
+![UFW Firewall](screenshots/04-ufw-firewall.png)
 
----
+UFW was configured with a default-deny inbound policy while explicitly allowing SSH.
 
-### UFW Firewall
+### Fail2Ban
 
-UFW was configured with a default-deny policy for incoming connections while allowing required SSH access.
+![Fail2Ban](screenshots/05-fail2ban.png)
 
-![UFW Firewall](<img width="562" height="198" alt="04-ufw-firewall" src="https://github.com/user-attachments/assets/e5a437f6-1c5e-4530-b061-68634d9cf98b" />
-)
+Fail2Ban monitors the SSH service and provides automated protection against repeated authentication failures.
 
-Final firewall policy:
+### Authentication Auditing
 
-- Incoming traffic: deny by default
-- Outgoing traffic: allow by default
-- SSH: TCP port 22 explicitly allowed
-- Firewall logging enabled
+![SSH Audit Log](screenshots/06-ssh-audit-log.png)
 
----
+System logs were reviewed to verify the transition from password-based authentication to public-key authentication.
 
-### Fail2Ban SSH Protection
+### Vulnerability Assessment
 
-Fail2Ban was installed and verified with an active `sshd` jail.
+![Lynis Assessment](screenshots/08-lynis-final.png)
 
-![Fail2Ban](<img width="573" height="269" alt="fail2ban" src="https://github.com/user-attachments/assets/16a09a1c-3448-411d-ad0a-a3e16efa7361" />
-)
+Lynis was used to assess the system, review findings, implement selected remediation, and validate improvements.
 
-The SSH jail monitors authentication activity through the systemd journal.
+The hardening index increased from **65 to 69** after selected SSH remediation.
 
-A deliberate ban was not generated from the management connection because VirtualBox NAT causes the Windows host to share the lab's management path. Controlled attack testing is planned from a separate Kali Linux VM.
+## Documentation
 
----
+Detailed project documentation is available in the [`documentation`](documentation/) directory.
 
-### SSH Authentication Auditing
+The project covers the complete process from baseline assessment through final security validation.
 
-SSH journal records were reviewed to verify authentication activity and configuration changes.
+## Skills Demonstrated
 
-![SSH Authentication Logs](<img width="1056" height="266" alt="06-ssh-audit-log png" src="https://github.com/user-attachments/assets/a950a509-869e-4f5a-a4ff-12c0a2da6453" />
-)
+Linux administration, Ubuntu Server, SSH, Ed25519 authentication, UFW, Fail2Ban, systemd, journalctl, Linux users and groups, least privilege, vulnerability assessment, Lynis, VirtualBox networking, troubleshooting, Markdown, and GitHub documentation.
 
-The logs demonstrate the progression from earlier password authentication to successful Ed25519 public-key authentication after SSH hardening.
+## Future Improvements
 
-They also provide evidence of SSH service reloads after configuration changes.
-
----
-
-### Lynis Security Assessment
-
-Lynis was used to perform an independent host security assessment after the initial hardening work.
-
-![Lynis Final Assessment](<img width="413" height="96" alt="08-lynis-final" src="https://github.com/user-attachments/assets/911d8a65-04b7-43cb-a6d0-075408c752e8" />
-)
-
-The initial Lynis hardening index was:
-
-**65**
-
-After reviewing the findings and implementing selected SSH security improvements, the system was rescanned.
-
-Final hardening index:
-
-**69**
-
-A total of **258 security tests** were performed.
-
-The hardening index was used as an assessment indicator rather than treated as a percentage of overall system security.
+Future work will include controlled Fail2Ban testing from a Kali Linux VM, network-based vulnerability scanning, `auditd`, file-integrity monitoring, additional kernel hardening, and incident-response exercises.
