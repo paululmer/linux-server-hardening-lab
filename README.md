@@ -183,7 +183,7 @@ Controlled attack testing is planned from a separate Kali Linux VM.
 
 System logs were reviewed to reconstruct SSH authentication activity.
 
-![SSH Authentication Logs](screenshots/06-ssh-audit-log.png.png)
+![SSH Authentication Logs](screenshots/screenshots06-ssh-audit-log.png)
 
 The journal showed the progression from earlier password-based authentication:
 
